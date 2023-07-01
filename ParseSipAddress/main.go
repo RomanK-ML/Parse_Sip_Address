@@ -12,7 +12,7 @@ import (
 func main() {
 	start := time.Now()
 	// Вызов функции ParseSipAddress с примером SIP-адреса
-	//isSip, data := ParseSipAddress("sip:user7@example.com;param1=value1 ")
+	//isSip, data := ParseSipAddress("sips:user5@192.0.2.1?param1=value;param2")
 	//
 	//// Вывод результатов разбора SIP-адреса
 	//fmt.Printf("isSip: %v\n", isSip)
@@ -23,8 +23,9 @@ func main() {
 	//fmt.Printf("port: %d\n", data["port"])
 	//fmt.Printf("params: %v\n", data["params"])
 	//fmt.Printf("Data: %v\n", data)
-	UnitTest()
-
+	for i := 0; i < 1000; i++ {
+		UnitTest()
+	}
 	duration := time.Since(start)
 	fmt.Printf("Время выполнения: %d мс\n", duration.Microseconds())
 }
@@ -105,6 +106,7 @@ func ParseSipAddress(str string) (isSip bool, data map[string]interface{}) {
 	return
 }
 
+// UnitTest Функция для тестирования ParseSipAddress
 func UnitTest() {
 
 	testData := []struct {
@@ -261,6 +263,17 @@ func UnitTest() {
 			},
 		},
 		{
+			str:         "sips:user5@192.0.2.1?param1=value",
+			expectedSip: true,
+			expected: map[string]interface{}{
+				"userName": "user5",
+				"ip":       "192.0.2.1",
+				"params": map[string]string{
+					"param1": "value",
+				},
+			},
+		},
+		{
 			str:         "sip:user6:pass@domain.net:6000",
 			expectedSip: true,
 			expected: map[string]interface{}{
@@ -292,7 +305,6 @@ func UnitTest() {
 		},
 	}
 
-	println("Starting")
 	for _, test := range testData {
 		isSip, data := ParseSipAddress(test.str)
 
@@ -304,5 +316,4 @@ func UnitTest() {
 			fmt.Printf("Expected data to be %v, but got %v for str: %s \n", test.expected, data, test.str)
 		}
 	}
-	println("End")
 }

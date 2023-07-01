@@ -11,21 +11,7 @@ import (
 
 func main() {
 	start := time.Now()
-	// Вызов функции ParseSipAddress с примером SIP-адреса
-	//isSip, data := ParseSipAddress("sips:user5@192.0.2.1?param1=value;param2")
-	//
-	//// Вывод результатов разбора SIP-адреса
-	//fmt.Printf("isSip: %v\n", isSip)
-	//fmt.Printf("userName: %s\n", data["userName"])
-	//fmt.Printf("userPassword: %s\n", data["userPassword"])
-	//fmt.Printf("domain: %s\n", data["domain"])
-	//fmt.Printf("ip: %s\n", data["ip"])
-	//fmt.Printf("port: %d\n", data["port"])
-	//fmt.Printf("params: %v\n", data["params"])
-	//fmt.Printf("Data: %v\n", data)
-	for i := 0; i < 1000; i++ {
-		UnitTest()
-	}
+	UnitTest()
 	duration := time.Since(start)
 	fmt.Printf("Время выполнения: %d мс\n", duration.Microseconds())
 }

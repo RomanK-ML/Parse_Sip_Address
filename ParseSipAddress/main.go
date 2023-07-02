@@ -16,13 +16,26 @@ func main() {
 	fmt.Printf("Время выполнения: %d мс\n", duration.Microseconds())
 }
 
-// ParseSipAddress Функция для разбора SIP-адреса
+//LittleGuy<sips:admin@10.0.0.3:5061>;tag=123
+
+// ParseSipAddress разбирает SIP-адрес и возвращает флаг успешного разбора и данные адреса
 func ParseSipAddress(str string) (isSip bool, data map[string]interface{}) {
 	// Удаление всех пробелов из строки
 	str = strings.ReplaceAll(str, " ", "")
 
 	// Создаем пустой map для хранения разобранных значений
 	data = make(map[string]interface{})
+
+	// Проверяем первый символ строки на наличие <
+	if strings.HasPrefix(str, "<") {
+		str = strings.ReplaceAll(str[1:], ">", "")
+	} else {
+		strDisplay := strings.Split(str, "<")
+		if len(strDisplay) > 1 {
+			data["displayName"] = strDisplay[0]
+			str = strings.ReplaceAll(strDisplay[1], ">", "")
+		}
+	}
 
 	prefix := ""
 	// Проверяем префикс "sip:"
@@ -276,6 +289,56 @@ func UnitTest() {
 				"userName": "admin",
 				"ip":       "10.0.0.3",
 				"port":     5061,
+			},
+		},
+		{
+			str:         "LittleGuy<sips:admin@10.0.0.3:5061>;tag=123",
+			expectedSip: true,
+			expected: map[string]interface{}{
+				"displayName": "LittleGuy",
+				"userName":    "admin",
+				"ip":          "10.0.0.3",
+				"port":        5061,
+				"params": map[string]string{
+					"tag": "123",
+				},
+			},
+		},
+		{
+			str:         "LittleGuy<sips:admin@10.0.0.3:5061;tag=123>",
+			expectedSip: true,
+			expected: map[string]interface{}{
+				"displayName": "LittleGuy",
+				"userName":    "admin",
+				"ip":          "10.0.0.3",
+				"port":        5061,
+				"params": map[string]string{
+					"tag": "123",
+				},
+			},
+		},
+		{
+			str:         "<sips:admin@10.0.0.3:5061>;tag=123",
+			expectedSip: true,
+			expected: map[string]interface{}{
+				"userName": "admin",
+				"ip":       "10.0.0.3",
+				"port":     5061,
+				"params": map[string]string{
+					"tag": "123",
+				},
+			},
+		},
+		{
+			str:         "<sips:admin@10.0.0.3:5061?tag=123>",
+			expectedSip: true,
+			expected: map[string]interface{}{
+				"userName": "admin",
+				"ip":       "10.0.0.3",
+				"port":     5061,
+				"params": map[string]string{
+					"tag": "123",
+				},
 			},
 		},
 		{

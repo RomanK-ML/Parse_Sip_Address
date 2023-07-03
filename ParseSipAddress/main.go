@@ -18,20 +18,20 @@ func main() {
 
 // ParseSipAddress разбирает SIP-адрес и возвращает флаг успешного разбора и данные адреса
 func ParseSipAddress(str string) (isSip bool, data map[string]interface{}) {
-	// Удаление всех пробелов из строки
-	str = strings.ReplaceAll(str, " ", "")
-
 	// Создаем пустой map для хранения разобранных значений
 	data = make(map[string]interface{})
+
+	// Удаление всех пробелов из строки
+	str = strings.ReplaceAll(str, " ", "")
 
 	// Проверяем первый символ строки на наличие <
 	if strings.HasPrefix(str, "<") {
 		str = strings.ReplaceAll(str[1:], ">", "")
 	} else {
-		strDisplay := strings.Split(str, "<")
-		if len(strDisplay) > 1 {
-			data["displayName"] = strDisplay[0]
-			str = strings.ReplaceAll(strDisplay[1], ">", "")
+		displayNameParts := strings.Split(str, "<")
+		if len(displayNameParts) > 1 {
+			data["displayName"] = displayNameParts[0]
+			str = strings.ReplaceAll(displayNameParts[1], ">", "")
 		}
 	}
 

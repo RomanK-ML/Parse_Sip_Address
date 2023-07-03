@@ -21,32 +21,39 @@ func ParseSipAddress(str string) (isSip bool, data map[string]interface{}) {
 	// Создаем пустой map для хранения разобранных значений
 	data = make(map[string]interface{})
 
-	// Удаление всех пробелов из строки
-	str = strings.ReplaceAll(str, " ", "")
+	// Удаление всех пробелов в начале и конце строки
+	str = strings.TrimSpace(str)
 
-	// Проверяем первый символ строки на наличие <
+	// Проверяем, начинается ли строка с символа "<"
 	if strings.HasPrefix(str, "<") {
+		// Удаляем символы < и >
 		str = strings.ReplaceAll(str[1:], ">", "")
 	} else {
+		// Если строка не начинается с "<", разбиваем ее на две части по символу "<"
 		displayNameParts := strings.Split(str, "<")
 		if len(displayNameParts) > 1 {
-			data["displayName"] = displayNameParts[0]
+			// Если есть разделитель "<", сохраняем часть до "<" в поле "displayName"
+			data["displayName"] = strings.TrimSpace(displayNameParts[0])
+			// Сохраняем часть после "<" в переменную str и удаляем символ ">"
 			str = strings.ReplaceAll(displayNameParts[1], ">", "")
 		}
 	}
 
+	// Удаление всех пробелов из строки
+	str = strings.ReplaceAll(str, " ", "")
+
 	prefix := ""
-	// Проверяем префикс "sip:"
+	// Проверяем префикс "sip:" или "sips:" в адресе.
 	if strings.HasPrefix(str, "sip:") {
-		// Удаление префикса "sip:"
+		// Если адрес начинается с "sip:", удаляем этот префикс
 		prefix = "sip:"
 		str = str[len(prefix):]
-		// Проверяем префикс "sips:"
 	} else if strings.HasPrefix(str, "sips:") {
-		// Удаление префикса "sips:"
+		// Если адрес начинается с "sips:", удаляем этот префикс
 		prefix = "sips:"
 		str = str[len(prefix):]
 	} else {
+		// Если префикс не найден, устанавливаем флаг isSip в false и возвращаем данные
 		isSip = false
 		return
 	}
@@ -70,11 +77,14 @@ func ParseSipAddress(str string) (isSip bool, data map[string]interface{}) {
 	if len(leftPart) > 1 {
 		domainAndPort := strings.Split(leftPart[1], ":")
 		if net.ParseIP(domainAndPort[0]) != nil {
+			// Если домен является IP-адресом, сохраняем его в data["ip"]
 			data["ip"] = domainAndPort[0]
 		} else {
+			// Если домен является именем хоста, сохраняем его в data["domain"]
 			data["domain"] = domainAndPort[0]
 		}
 		if len(domainAndPort) > 1 {
+			// Преобразуем порт в целое число и сохраняем его в data["port"]
 			port, err := strconv.Atoi(domainAndPort[1])
 			if err == nil {
 				data["port"] = port
@@ -90,8 +100,10 @@ func ParseSipAddress(str string) (isSip bool, data map[string]interface{}) {
 		for _, sipParameter := range sipParameters {
 			keyValue := strings.SplitN(sipParameter, "=", 2)
 			if len(keyValue) > 1 {
+				// Если параметр имеет значение, сохраняем его в params
 				params[keyValue[0]] = keyValue[1]
 			} else {
+				// Если параметр не имеет значения, сохраняем пустую строку в params
 				params[keyValue[0]] = ""
 			}
 		}
@@ -325,6 +337,15 @@ func UnitTest() {
 				"params": map[string]string{
 					"tag": "123",
 				},
+			},
+		},
+		{
+			str:         " Little Guy <sip:lg@domain.net >",
+			expectedSip: true,
+			expected: map[string]interface{}{
+				"displayName": "Little Guy",
+				"userName":    "lg",
+				"domain":      "domain.net",
 			},
 		},
 		{

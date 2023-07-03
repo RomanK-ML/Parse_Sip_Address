@@ -16,8 +16,6 @@ func main() {
 	fmt.Printf("Время выполнения: %d мс\n", duration.Microseconds())
 }
 
-//LittleGuy<sips:admin@10.0.0.3:5061>;tag=123
-
 // ParseSipAddress разбирает SIP-адрес и возвращает флаг успешного разбора и данные адреса
 func ParseSipAddress(str string) (isSip bool, data map[string]interface{}) {
 	// Удаление всех пробелов из строки

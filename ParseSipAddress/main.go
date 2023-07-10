@@ -33,12 +33,17 @@ func ParseSipAddress(str string) (data SipAddress) {
 	// Разбиваем строку на компоненты, используя пробел в качестве разделителя
 	components := strings.Split(str, " ")
 
+	// Функция для разбора SIP-адреса
 	parseSipAddress := func(sipAddress string) {
+		// Разделяем адрес на части по символу "@"
 		parts := strings.Split(sipAddress, "@")
+
+		// Проверяем условие для выполнения разбора
 		if !(len(parts) > 1 || strings.HasPrefix(parts[0], "<") || strings.HasPrefix(parts[0], "sip:") || strings.HasPrefix(parts[0], "sips:")) {
 			return
 		}
 
+		// Обработка имени пользователя
 		userNameStr := strings.TrimPrefix(parts[0], "<")
 		if strings.HasPrefix(userNameStr, "sip:") {
 			userNameStr = userNameStr[4:]
@@ -46,24 +51,30 @@ func ParseSipAddress(str string) (data SipAddress) {
 			userNameStr = userNameStr[5:]
 		}
 
-		userPasswordStr := strings.Split(userNameStr, ":")
+		// Разделяем имя пользователя и пароль
+		userPasswordStr := strings.SplitN(userNameStr, ":", 2)
 		if len(userPasswordStr) > 1 {
 			data.UserPassword = userPasswordStr[1]
 		}
 		if strings.HasSuffix(userPasswordStr[0], ">") {
+			// Удаляем символ ">" в конце имени пользователя
 			data.UserName = userPasswordStr[0][:len(userPasswordStr[0])-1]
 		} else {
 			data.UserName = userPasswordStr[0]
 		}
 
 		if len(parts) > 1 {
+			// Обработка домена и параметров
 			domainParamsStr := strings.TrimSuffix(parts[1], ">")
+			// Разделяем строку домена и параметров на компоненты
 			componentsStr := strings.FieldsFunc(domainParamsStr, func(r rune) bool {
 				return r == '?' || r == ';' || r == '>' || r == '&'
 			})
 
-			domainPortComponents := strings.Split(componentsStr[0], ":")
+			// Обработка домена и порта
+			domainPortComponents := strings.SplitN(componentsStr[0], ":", 2)
 			if len(domainPortComponents) > 1 {
+				// Преобразуем порт в число
 				port, err := strconv.Atoi(domainPortComponents[1])
 				if err == nil {
 					data.Port = port
@@ -77,9 +88,11 @@ func ParseSipAddress(str string) (data SipAddress) {
 			}
 
 			if len(componentsStr) > 1 {
+				// Обработка параметров
 				data.Params = make(map[string]string)
 				for i := 1; i < len(componentsStr); i++ {
 					if componentsStr[i] != "" {
+						// Разделяем ключ и значение параметра
 						keyValue := strings.SplitN(componentsStr[i], "=", 2)
 						if len(keyValue) > 1 {
 							data.Params[keyValue[0]] = keyValue[1]
@@ -97,6 +110,7 @@ func ParseSipAddress(str string) (data SipAddress) {
 		component := components[i]
 
 		if strings.HasPrefix(component, "\"") || strings.HasPrefix(component, "'") {
+			// Обработка отображаемого имени
 			if strings.HasSuffix(component, "\"") || strings.HasSuffix(component, "'") {
 				data.DisplayName = component[1 : len(component)-1]
 			} else {
@@ -116,7 +130,6 @@ func ParseSipAddress(str string) (data SipAddress) {
 			parseSipAddress(component)
 		}
 	}
-
 	return
 }
 
@@ -339,7 +352,7 @@ func UnitTest() {
 			},
 		},
 		{
-			str: "textx 'Little Guy' <sip:lg@domain.net>",
+			str: "textx \"Little Guy\" <sip:lg@domain.net>",
 			expected: SipAddress{
 				DisplayName: "Little Guy",
 				UserName:    "lg",
@@ -387,6 +400,12 @@ func UnitTest() {
 		},
 		{
 			str: "text1 192.168.34.25 text2",
+			expected: SipAddress{
+				Ip: "192.168.34.25",
+			},
+		},
+		{
+			str: "text1 text2   192.168.34.25 text2",
 			expected: SipAddress{
 				Ip: "192.168.34.25",
 			},

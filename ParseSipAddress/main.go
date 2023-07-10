@@ -23,9 +23,11 @@ func main() {
 	start := time.Now()
 	//data := ParseSipAddress("'Little Guy' <sip:user7> ")
 	//PrintData(data)
-	UnitTest()
+	for i := 0; i < 10000; i++ {
+		UnitTest()
+	}
 	duration := time.Since(start)
-	fmt.Printf("Время выполнения: %d мс\n", duration.Microseconds())
+	fmt.Printf("Время выполнения: %d мкс\n", duration.Microseconds())
 }
 
 func ParseSipAddress(str string) (data SipAddress) {

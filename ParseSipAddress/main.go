@@ -21,11 +21,16 @@ type SipAddress struct {
 
 func main() {
 	start := time.Now()
-	//data := ParseSipAddress("'Little Guy' <sip:user7> ")
+
+	//data := ParseSipAddress("text1 text2 'Little Guy' <user7:mypass> text3 text4 ")
 	//PrintData(data)
-	for i := 0; i < 10000; i++ {
-		UnitTest()
-	}
+
+	//for i := 0; i < 10000; i++ {
+	//	UnitTest()
+	//}
+
+	UnitTest()
+
 	duration := time.Since(start)
 	fmt.Printf("Время выполнения: %d мкс\n", duration.Microseconds())
 }

@@ -412,7 +412,7 @@ func UnitTest() {
 			},
 		},
 		{
-			str: "text1 text2   192.168.34.25 text2",
+			str: "text1 text2   192.168.34.25  text2",
 			expected: SipAddress{
 				Ip: "192.168.34.25",
 			},
@@ -429,9 +429,9 @@ func UnitTest() {
 }
 
 func PrintData(data SipAddress) {
+	fmt.Printf("\nDisplayName: ", data.DisplayName)
 	fmt.Printf("\nUserName: ", data.UserName)
 	fmt.Printf("\nUserPassword: ", data.UserPassword)
-	fmt.Printf("\nDisplayName: ", data.DisplayName)
 	fmt.Printf("\nDomain: ", data.Domain)
 	fmt.Printf("\nIp: ", data.Ip)
 	fmt.Printf("\nPort: ", data.Port)

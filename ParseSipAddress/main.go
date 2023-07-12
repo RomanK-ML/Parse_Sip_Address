@@ -11,6 +11,7 @@ import (
 
 type SipAddress struct {
 	DisplayName  string
+	SipType      string
 	UserName     string
 	UserPassword string
 	Domain       string
@@ -37,6 +38,8 @@ func main() {
 
 func ParseSipAddress(str string) (data SipAddress) {
 
+	data.SipType = "unknown"
+
 	// Разбиваем строку на компоненты, используя пробел в качестве разделителя
 	components := strings.Split(str, " ")
 
@@ -53,8 +56,10 @@ func ParseSipAddress(str string) (data SipAddress) {
 		// Обработка имени пользователя
 		userNameStr := strings.TrimPrefix(parts[0], "<")
 		if strings.HasPrefix(userNameStr, "sip:") {
+			data.SipType = "sip"
 			userNameStr = userNameStr[4:]
 		} else if strings.HasPrefix(userNameStr, "sips:") {
+			data.SipType = "sips"
 			userNameStr = userNameStr[5:]
 		}
 
@@ -151,6 +156,7 @@ func UnitTest() {
 			str: "sip:alice@example.com:5060;transport=udp",
 			expected: SipAddress{
 				UserName: "alice",
+				SipType:  "sip",
 				Domain:   "example.com",
 				Port:     5060,
 				Params: map[string]string{
@@ -162,6 +168,7 @@ func UnitTest() {
 			str: "sip:bob@example.com",
 			expected: SipAddress{
 				UserName: "bob",
+				SipType:  "sip",
 				Domain:   "example.com",
 			},
 		},
@@ -169,6 +176,7 @@ func UnitTest() {
 			str: "sip:user123:pass456@domain.com:5060?param1=value1",
 			expected: SipAddress{
 				UserName:     "user123",
+				SipType:      "sip",
 				UserPassword: "pass456",
 				Domain:       "domain.com",
 				Port:         5060,
@@ -181,6 +189,7 @@ func UnitTest() {
 			str: "sips:admin@10.0.0.1",
 			expected: SipAddress{
 				UserName: "admin",
+				SipType:  "sips",
 				Ip:       "10.0.0.1",
 			},
 		},
@@ -188,6 +197,7 @@ func UnitTest() {
 			str: "sip:carol@example.com:5080",
 			expected: SipAddress{
 				UserName: "carol",
+				SipType:  "sip",
 				Domain:   "example.com",
 				Port:     5080,
 			},
@@ -196,6 +206,7 @@ func UnitTest() {
 			str: "sip:user1@domain.com",
 			expected: SipAddress{
 				UserName: "user1",
+				SipType:  "sip",
 				Domain:   "domain.com",
 			},
 		},
@@ -203,6 +214,7 @@ func UnitTest() {
 			str: "sip:user2:pass@192.168.0.1",
 			expected: SipAddress{
 				UserName:     "user2",
+				SipType:      "sip",
 				UserPassword: "pass",
 				Ip:           "192.168.0.1",
 			},
@@ -211,6 +223,7 @@ func UnitTest() {
 			str: "sips:user3@domain.org:1234;param1=value1;param2=value2",
 			expected: SipAddress{
 				UserName: "user3",
+				SipType:  "sips",
 				Domain:   "domain.org",
 				Port:     1234,
 				Params: map[string]string{
@@ -223,6 +236,7 @@ func UnitTest() {
 			str: "sip:john@example.com",
 			expected: SipAddress{
 				UserName: "john",
+				SipType:  "sip",
 				Domain:   "example.com",
 			},
 		},
@@ -230,6 +244,7 @@ func UnitTest() {
 			str: "sip:jane@192.168.1.100:5062;param1=value1",
 			expected: SipAddress{
 				UserName: "jane",
+				SipType:  "sip",
 				Ip:       "192.168.1.100",
 				Port:     5062,
 				Params: map[string]string{
@@ -241,6 +256,7 @@ func UnitTest() {
 			str: "sips:guest@example.org",
 			expected: SipAddress{
 				UserName: "guest",
+				SipType:  "sips",
 				Domain:   "example.org",
 			},
 		},
@@ -248,6 +264,7 @@ func UnitTest() {
 			str: "sip:user4:password@10.0.0.2:5080?param1=value1&param2=value2",
 			expected: SipAddress{
 				UserName:     "user4",
+				SipType:      "sip",
 				UserPassword: "password",
 				Ip:           "10.0.0.2",
 				Port:         5080,
@@ -261,6 +278,7 @@ func UnitTest() {
 			str: "sip:test@example.com:5060;param1=value1;param2=value2",
 			expected: SipAddress{
 				UserName: "test",
+				SipType:  "sip",
 				Domain:   "example.com",
 				Port:     5060,
 				Params: map[string]string{
@@ -273,6 +291,7 @@ func UnitTest() {
 			str: "sips:user5@192.0.2.1",
 			expected: SipAddress{
 				UserName: "user5",
+				SipType:  "sips",
 				Ip:       "192.0.2.1",
 			},
 		},
@@ -280,6 +299,7 @@ func UnitTest() {
 			str: "sips:user5@192.0.2.1?param1=value",
 			expected: SipAddress{
 				UserName: "user5",
+				SipType:  "sips",
 				Ip:       "192.0.2.1",
 				Params: map[string]string{
 					"param1": "value",
@@ -290,6 +310,7 @@ func UnitTest() {
 			str: "sip:user6:pass@domain.net:6000",
 			expected: SipAddress{
 				UserName:     "user6",
+				SipType:      "sip",
 				UserPassword: "pass",
 				Domain:       "domain.net",
 				Port:         6000,
@@ -299,6 +320,7 @@ func UnitTest() {
 			str: "sips:admin@10.0.0.3:5061",
 			expected: SipAddress{
 				UserName: "admin",
+				SipType:  "sips",
 				Ip:       "10.0.0.3",
 				Port:     5061,
 			},
@@ -308,6 +330,7 @@ func UnitTest() {
 			expected: SipAddress{
 				DisplayName: "LittleGuy",
 				UserName:    "admin",
+				SipType:     "sips",
 				Ip:          "10.0.0.3",
 				Port:        5061,
 				Params: map[string]string{
@@ -320,6 +343,7 @@ func UnitTest() {
 			expected: SipAddress{
 				DisplayName: "LittleGuy",
 				UserName:    "admin",
+				SipType:     "sips",
 				Ip:          "10.0.0.3",
 				Port:        5061,
 				Params: map[string]string{
@@ -332,6 +356,7 @@ func UnitTest() {
 			expected: SipAddress{
 				DisplayName: "LittleGuy",
 				UserName:    "admin",
+				SipType:     "sips",
 				Ip:          "10.0.0.3",
 				Port:        5061,
 				Params: map[string]string{
@@ -343,6 +368,7 @@ func UnitTest() {
 			str: "<sips:admin@10.0.0.3:5061>;tag=123",
 			expected: SipAddress{
 				UserName: "admin",
+				SipType:  "sips",
 				Ip:       "10.0.0.3",
 				Port:     5061,
 				Params: map[string]string{
@@ -355,6 +381,7 @@ func UnitTest() {
 			expected: SipAddress{
 				DisplayName: "LittleGuy",
 				UserName:    "lg",
+				SipType:     "sip",
 				Domain:      "domain.net",
 			},
 		},
@@ -363,6 +390,7 @@ func UnitTest() {
 			expected: SipAddress{
 				DisplayName: "Little Guy",
 				UserName:    "lg",
+				SipType:     "sip",
 				Domain:      "domain.net",
 			},
 		},
@@ -370,6 +398,7 @@ func UnitTest() {
 			str: "<sips:admin@10.0.0.3:5061?tag=123>",
 			expected: SipAddress{
 				UserName: "admin",
+				SipType:  "sips",
 				Ip:       "10.0.0.3",
 				Port:     5061,
 				Params: map[string]string{
@@ -381,6 +410,7 @@ func UnitTest() {
 			str: "sip:2011@192.168.1.150:5060;alias=192.168.1.151~5060~1",
 			expected: SipAddress{
 				UserName: "2011",
+				SipType:  "sip",
 				Ip:       "192.168.1.150",
 				Port:     5060,
 				Params: map[string]string{
@@ -392,6 +422,7 @@ func UnitTest() {
 			str: "sip:user7@example.com;param1=value1",
 			expected: SipAddress{
 				UserName: "user7",
+				SipType:  "sip",
 				Domain:   "example.com",
 				Params: map[string]string{
 					"param1": "value1",
@@ -403,18 +434,21 @@ func UnitTest() {
 			expected: SipAddress{
 				DisplayName: "Little Guy",
 				UserName:    "user7",
+				SipType:     "sip",
 			},
 		},
 		{
 			str: "text1 192.168.34.25 text2",
 			expected: SipAddress{
-				Ip: "192.168.34.25",
+				SipType: "unknown",
+				Ip:      "192.168.34.25",
 			},
 		},
 		{
 			str: "text1 text2   192.168.34.25  text2",
 			expected: SipAddress{
-				Ip: "192.168.34.25",
+				SipType: "unknown",
+				Ip:      "192.168.34.25",
 			},
 		},
 	}
@@ -430,6 +464,7 @@ func UnitTest() {
 
 func PrintData(data SipAddress) {
 	fmt.Printf("\nDisplayName: ", data.DisplayName)
+	fmt.Printf("\nSipType: ", data.SipType)
 	fmt.Printf("\nUserName: ", data.UserName)
 	fmt.Printf("\nUserPassword: ", data.UserPassword)
 	fmt.Printf("\nDomain: ", data.Domain)
